@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Create VM Snapshot
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: kubevirt.io/v1
+          kind: VirtualMachine
+          metadata:
+            name: "{{ snapshot_name }}"
+            namespace: linuxvm
+        spec:
+          source:
+            apiGroup: kubevirt.io
+            kind: VirtualMachine
+            name: "{{ vm_name }}"
