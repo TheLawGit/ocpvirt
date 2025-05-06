@@ -5,3 +5,6 @@
       kubevirt.core.kubevirt_vm_info:
         namespace: "{{ namespace }}"
       register: vm_list
+    - name: Print VMs
+      debug:
+        msg: "{{ vm_list }}"
