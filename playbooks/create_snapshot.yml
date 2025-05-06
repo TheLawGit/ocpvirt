@@ -3,11 +3,12 @@
   tasks:
     - name: Create VM Snapshot
       kubernetes.core.k8s:
-        api_version: kubevirt.io/v1
-        kind: VirtualMachine
+        apiVersion: snapshot.kubevirt.io/v1beta1
+        kind: VirtualMachineSnapshot
         metadata:
           name: "{{ snapshot_name }}"
-          namespace: linuxvm
         spec:
-          kind: VirtualMachine
-          name: "{{ vm_name }}"
+          source:
+            apiGroup: kubevirt.io
+            kind: VirtualMachine
+            name: "{{ vm_name }}"
