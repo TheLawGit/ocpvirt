@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Get a list of all VirtualMachines
+      redhat.openshift_virtualization.kubevirt_vm_info:
+        namespace: "{{ namespace }}"
+      register: vm_list
