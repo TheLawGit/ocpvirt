@@ -10,6 +10,5 @@
             name: "{{ snapshot_name }}"
             namespace: linuxvm
         spec:
-          source:
-            kind: VirtualMachine
-            name: "{{ vm_name }}"
+          kind: VirtualMachine
+          name: "{{ vm_name }}"
