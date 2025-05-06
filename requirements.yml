@@ -1,4 +1,5 @@
 collections:
-- name: redhat.openshift
-- name: redhat.openshift_virtualization
 - name: kubernetes.core
+- name: vmware.vmware_rest
+- name: community.general
+- name: kubevirt.core
