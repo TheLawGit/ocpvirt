@@ -11,6 +11,5 @@
             namespace: linuxvm
         spec:
           source:
-            apiGroup: kubevirt.io
             kind: VirtualMachine
             name: "{{ vm_name }}"
