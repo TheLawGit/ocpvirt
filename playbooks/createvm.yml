@@ -1,0 +1,52 @@
+- hosts: all  # Target all hosts in your inventory
+  tasks:
+  - name: Create project
+    redhat.openshift.k8s:
+      state: present
+      definition:
+        apiVersion: project.openshift.io/v1
+        kind: Project
+        metadata:
+          name: workloads
+  - name: Create fedora virtual machine
+    redhat.openshift_virtualization.kubevirt_vm:
+      state: present
+      name: fedora-httpd
+      namespace: workloads
+      labels:
+        app: httpd
+      instancetype:
+        name: u1.medium
+      preference:
+        name: fedora
+      spec:
+        domain:
+          devices:
+            interfaces:
+              - name: default
+                masquerade: {}
+        networks:
+          - name: default
+            pod: {}
+        volumes:
+          - containerDisk:
+              image: quay.io/containerdisks/fedora:latest
+            name: containerdisk
+          - cloudInitNoCloud:
+              userData: |-
+                #cloud-config
+                # The default username is: fedora
+                ssh_authorized_keys:
+                - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCq/9OT1B9M2+61f5aHOIa90G1wSxLKXhCNa4y9v9OwDlHQskeKAY7hJaKlHhHT6jBrIxqXYTTQEMXIPtSe4vV2Um1n0/ne3pVVWVxHbsFb6ithuMzPenBISUZh/4TrPuFnRrch5/7pTOyB1drurb8BPggwgZgEgMS3on9rD/ezKqtQqrLn7Ft1w1LSsXRpzv6ayQAWmYdKjb9wmbLjdHIELft6FhU+cMWM+QpBGBDNRVBA7c1O86SOcpa0aNvBG+26r86KHIUS64otR/bEAxKO9ycvM5/tveb/j/2l96LKZo7Ccgy/R8AsuQLTsDbl7nSeR7clYxK5LdnrcL22Mdkmb7oOJMBCljys1suGH4skCKDyPYqy/nk7lDm19AYHbF2rVxFltAhB71b0JL+TuWsXbuHhN6sHH5KYD+lcioaXf6nOXp01Z6lUvkxcN0RP6KlGJUG8NRFTOXhz2mXXuJixDHuWnu4CeNdQOm0NuuPKnqyHaD2YcHQsxuC4M/Te+Wk=
+            name: cloudinit
+  
+  - name: Wait for virtual machine IP to be populated
+    kubernetes.core.k8s_info:
+      api_version: kubevirt.io/v1
+      kind: VirtualMachineInstance
+      name: fedora-httpd
+      namespace: workloads
+    register: vmi
+    retries: 60
+    delay: 10
+    until: (vmi.resources[0].status.interfaces[0]['ipAddress'] | default('')) | length > 0
